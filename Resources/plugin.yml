@@ -1,0 +1,10 @@
+name: Guild
+main: cn.Guild
+version: 1.0
+author: key_q
+commands:
+   basic:
+      description: This is a demo command.
+      usage: /<command> [player]
+      permission: <plugin name>.basic
+      permission-message: You don't have <permission>
