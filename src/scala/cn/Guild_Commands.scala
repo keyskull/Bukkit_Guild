@@ -1,9 +1,9 @@
-package Guild
+/*
 
 
-import cn.Guild
+
 import org.bukkit.command.{Command, CommandExecutor, CommandSender}
-  import scala.collection.JavaConverters._
+import scala.collection.JavaConverters._
 
 
   /**
@@ -17,7 +17,6 @@ class Guild_Commands extends CommandExecutor {
         case  _ =>Guild_Commands.show_help(commandSender)
       }
       else Guild_Commands.show_help(commandSender)
-
       return true
     }
   }
@@ -31,4 +30,4 @@ object Guild_Commands {
         ))
     }
   }
-
+*/

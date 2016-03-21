@@ -5,15 +5,14 @@ package cn
   */
 
 import java.io.File
-import _root_.Guild.{Language, Guild_Commands}
+import cn._Guild.{Guild_Setup,Guild_Commands}
 import org.bukkit.plugin.java.JavaPlugin
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 class Guild extends JavaPlugin{
-  private val select_language =new Language(this,_:String)
+  val select_language =new Language(this,_:String)
   override  def onLoad(): Unit ={
-    getLogger.info("onLoad has been invoked!")
     val config_file=  new File(getDataFolder,"config.yml")
     this.getDataFolder.mkdir
     if(!config_file.createNewFile)getConfig.getKeys(false).asScala.map(m => Guild.config(m)=getConfig.get(m))
@@ -22,9 +21,13 @@ class Guild extends JavaPlugin{
     saveConfig
     select_language(Guild.config("language").asInstanceOf[String])
     getLogger.info(Language.get_bar("Finish_Load_Config"))
+
   }
   override def onEnable():Unit= {
-    getLogger.info("onEnable has been invoked!")
+    val setup=new Guild_Setup(this,this.getLogger)
+    setup.setupPermissions()
+    setup.setupChat()
+    setup.setupEconomy()
     this.getCommand("Guild").setExecutor(new Guild_Commands)
   }
   override def onDisable():Unit={
