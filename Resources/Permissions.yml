@@ -1,0 +1,16 @@
+Guild.Admin:
+      description: Admin permissions for Guild plugin.
+      default: false
+      children:
+          Guild.Basics: true
+          Guild.Delete.*: true
+          Guild.ChangeOwner.*: true
+Guild.Basics:
+       description: Basic permissions for Guild plugin.
+       default: true
+       children:
+          Guild.Create: true
+          Guild.Info.basics: true
+          Guild.Invite: true
+          Guild.Jion: true
+          Guild.Leave: true

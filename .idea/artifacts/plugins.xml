@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact name="plugins">
+    <output-path>$PROJECT_DIR$/../../Spigottest/plugins/</output-path>
+    <root id="root">
+      <element id="artifact" artifact-name="Bukkit_Plugin_Guild" />
+    </root>
+  </artifact>
+</component>

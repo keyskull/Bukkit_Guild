@@ -3,8 +3,8 @@ main: cn.Guild
 version: 1.0
 author: key_q
 commands:
-   basic:
-      description: This is a demo command.
+   Guild:
+      description: Guild basic command.
       usage: /<command> [player]
-      permission: <plugin name>.basic
+      permission: Guild.basic
       permission-message: You don't have <permission>
