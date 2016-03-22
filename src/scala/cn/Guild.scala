@@ -5,7 +5,8 @@ package cn
   */
 
 import java.io.File
-import cn._Guild.{Guild_Setup,Guild_Commands}
+import java.util
+import cn._Guild.{Guild_Setup, Guild_Commands}
 import org.bukkit.plugin.java.JavaPlugin
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -20,19 +21,27 @@ class Guild extends JavaPlugin{
     Guild.config.map( m =>getConfig.set(m._1,m._2))
     saveConfig
     select_language(Guild.config("language").asInstanceOf[String])
+    Language.set_macro("%money%",Guild.config.get("Create_Guild_Money").get.toString)
     getLogger.info(Language.get_bar("Finish_Load_Config"))
 
   }
   override def onEnable():Unit= {
-    val setup=new Guild_Setup(this,this.getLogger)
-    setup.setupPermissions()
-    setup.setupChat()
-    setup.setupEconomy()
-    this.getCommand("Guild").setExecutor(new Guild_Commands)
+    val setup=new Guild_Setup(this)
+    setup.setupPermissions
+    setup.setupChat
+    setup.setupEconomy
+    setup.setupGuild_Data
+    this.getCommand("Guild").setExecutor(new Guild_Commands(setup))
+    this.getServer.getPluginManager.registerEvents(new cn._Guild.Guild_Listener(setup), this);
+
+
   }
   override def onDisable():Unit={
     getLogger.info("onDisable has been invoked!")
   }
+
+
+
 }
 
 object Guild {
@@ -47,4 +56,5 @@ object Guild {
     "Guild-Max-People" -> 50,
     "yo" -> true
   )
+  def get_Config_asJava():util.Map[String, Any] = config.asJava
 }
