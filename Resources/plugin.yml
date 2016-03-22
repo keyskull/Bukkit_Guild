@@ -5,6 +5,70 @@ author: key_q
 commands:
    Guild:
       description: Guild basic command.
-      usage: /<command> [player]
       permission: Guild.basic
       permission-message: You don't have <permission>
+permissions:
+    Guild.*:
+        description: Gives access to all doorman commands
+        children:
+            Guild.basic: true
+            Guild.Admin: true
+            Guild.People: true
+            Guild.Owner: true
+            Guild.VIP: true
+    Guild.basic:
+        description: Allows user basic Permission
+        default: true
+    Guild.basic.*:
+        description: Allows you to kick a user
+        children:
+            Guild.basic.create: true
+            Guild.basic.list: true
+            Guild.basic.leave: true
+            Guild.basic.help: true
+            Guild.basic.join: true
+    Guild.People:
+        description: Allows user basic Permission
+        default: true
+    Guild.People.*:
+        description: Allows user basic Permission
+        children:
+            Guild.People.leave: true
+            Guild.People.cz: true
+            Guild.People.jn: true
+            Guild.People.home: true
+            Guild.People.info: true
+    Guild.Owner:
+        description: Allows you contorl the guild.
+        default: true
+    Guild.Owner.*:
+        description: Allows you to kick a user
+        children:
+            Guild.Owner.sj: true
+            Guild.Owner.jj: true
+            Guild.Owner.claim: true
+            Guild.Owner.sethome: true
+            Guild.Owner.jiesan: true
+            Guild.Owner.zr: true
+    Guild.VIP:
+        description: Allows you contorl the guild.
+        default: true
+    Guild.VIP.*:
+            description: Allows you to kick a user
+            children:
+                Guild.VIP.kick: true
+                Guild.VIP.invite: true
+                Guild.VIP.up: true
+                Guild.VIP.jieshou: true
+                Guild.VIP.pvp: true
+    Guild.Admin:
+        description: Any Guild Permission.
+        default: op
+    Guild.basic.*:
+            default: true
+    Guild.People.*:
+            default: true
+    Guild.VIP.*:
+            default: true
+    Guild.Owner.*:
+            default: true

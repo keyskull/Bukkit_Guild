@@ -35,17 +35,30 @@ object Language{
   private lazy val bars:mutable.Map[String,String]=mutable.Map(
     "Finish_Load_Config"->"读取配置完成.",
     "No_Lang"->" %file% 没有这个语言文件.",
-    "Guild_Create_Info" ->"创建 /guild create <公会名>  玩家可创建公会，创建公会需消耗金币50000",
-    "Guild_Join_Info" ->"申请 /guild join <公会名> 玩家只能通过申请或者邀请进入公会"
+    "Guild_create_Info" ->"创建 /guild create <公会名>  玩家可创建公会，创建公会需消耗金币 %money%",
+    "Guild_join_Info" ->"申请 /guild join <公会名> 玩家只能通过申请或者邀请进入公会",
+    "Guild_list_Info"->"公会列表 /guild list all 玩家可以查询本服所有创建公会",
+    "Guild_help_Info"->"帮助说明",
+    "Not_func"->"没有这个指令",
+    "No_Permission_For"->"%1% 没有这个权限",
+    "Have_Guild"->"你已经在一个公会里了.",
+    "Guild_Created"->"成功创建公会."
   )
+  def set_macro(macros:String,value:String):Unit= bar_macros(macros)=value
 
   def get_bar(bar:String):String={
-    var bar_string =try{ Language.bars(bar)}catch{case ex:Exception => "" }
-    for(match_string <- """%[a-zA-Z+]%""".r.findAllIn(bar_string))yield
-      bar_string = """%[a-zA-Z+]%""".r.replaceFirstIn(bar_string,bar_macros(match_string))
+    var bar_string =try{ Language.bars(bar)}catch{case ex:Exception => bar }
+    for(match_string <- """%\w+%""".r.findAllIn(bar_string))yield
+      bar_string = """%\w+%""".r.replaceFirstIn(bar_string,bar_macros(match_string))
     return bar_string
   }
-  def get_bar(commandSender: CommandSender,bar:String):String={
-    return ""
+
+  def get_bar(pre:String,bar:String):String={
+    bar_macros("1")=pre;
+    var bar_string =try{ Language.bars(bar)}catch{case ex:Exception => bar }
+    for(match_string <- """%\w+%""".r.findAllIn(bar_string))yield
+      bar_string = """%\w+%""".r.replaceFirstIn(bar_string,bar_macros(match_string))
+    return bar_string
   }
+
 }
