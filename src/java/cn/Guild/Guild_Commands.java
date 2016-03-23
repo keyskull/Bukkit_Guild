@@ -24,7 +24,9 @@ public class Guild_Commands implements CommandExecutor {
     private Economy econ;
     private Invite Invite;
     private Contribution Contribution;
+    private Guild_Level guild_level;
     public Guild_Commands(Guild_Setup setup) {
+        guild_level=setup.Guild_Level;
         Contribution=setup.contribution;
         Invite=setup.Invite;
         econ=setup.econ;
@@ -193,7 +195,6 @@ public class Guild_Commands implements CommandExecutor {
                 player.sendMessage(Language.get_bar("Failed"));
                 return false;
             }
-
     }
 
     public Boolean leave(Player player) {
@@ -236,21 +237,43 @@ public class Guild_Commands implements CommandExecutor {
         player.sendMessage(Language.get_bar(String.valueOf(contribution),"cz_Success"));
         return true;
     }
-    public Boolean up(Player player,String[] args) {
 
+    public Boolean up(Player player,String[] args) {
+        if(Guild.isOwner(player.getName()))
+            guild_level.Up_Guild_Level(args[1]);
         return true;
     }
-    public Boolean sj(Player player,String[] args) {
+    public Boolean js(Player player,String[] args) {
         return true;
     }
     public Boolean jn(Player player,String[] args) {
         return true;
     }
     public Boolean invade(Player player,String[] args) {
+        if(Guild.isOwner(player.getName())){
+
+        }
         return true;
     }
-    public Boolean js(Player player,String[] args) {
-        return true;
+    public Boolean sj(Player player,String[] args) {
+        if(Guild.isOwner(player.getName())){
+            Guild.People_Upgrade(args[1]);
+            player.sendMessage(Language.get_bar("sj_Success"));
+            return true;
+        }else {
+            player.sendMessage(Language.get_bar("Failed"));
+            return false;
+        }
+    }
+    public Boolean jj(Player player,String[] args) {
+        if(Guild.isOwner(player.getName())){
+            Guild.People_Downgrade(args[1]);
+            player.sendMessage(Language.get_bar("jj_Success"));
+            return true;
+        }else {
+            player.sendMessage(Language.get_bar("Failed"));
+            return false;
+        }
     }
     public Boolean claim(Player player,String[] args) {
         return true;

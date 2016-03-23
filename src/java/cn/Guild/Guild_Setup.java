@@ -8,6 +8,8 @@ import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.scheduler.BukkitRunnable;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -22,8 +24,9 @@ public class Guild_Setup {
     public static Economy econ = null;
     public static Permission perms = null;
     public static Chat chat = null;
-    private Guild_Launch plugin;
+    private static Guild_Launch plugin =null;
     private static YamlConfiguration Guild_Yaml=null;
+
     public final Invite Invite=new Invite();
     public final Cache Cache=new Cache();
     public final Contribution contribution=new Contribution();
@@ -36,13 +39,24 @@ public class Guild_Setup {
         this.log=guild_launch.getLogger();
         this.setupGuild_Data();
         this.Save_Guild_Data();
+        new BukkitRunnable() {
+            int time = (int)Guild_Launch.get_Config_asJava().get("auto_save");  // 六十秒
+            @Override
+            public void run() {
+                if(--time < 0) {
+                    Guild_Setup.Save_Guild_Data();
+                    plugin.getLogger().info(Language.get_bar("Save_File_Success"));
+                    time = (int)Guild_Launch.get_Config_asJava().get("auto_save");
+                }
+            }
+        }.runTaskTimer(plugin, 0L, 20L);
     }
 
     protected static YamlConfiguration Get_Guidl_Yaml(){
         return Guild_Yaml;
     }
 
-    private boolean Save_Guild_Data(){
+    public static boolean Save_Guild_Data(){
         try{
             Guild_Yaml.save(new File(plugin.getDataFolder(),"data.yml"));
         }catch (IOException e){
@@ -61,7 +75,8 @@ public class Guild_Setup {
                 String Owner=Guild_Yaml.getString(s+".Owner");
                 List<String> VIP=Guild_Yaml.getStringList(s+".CEO");
                 List<String> people=Guild_Yaml.getStringList(s+".People");
-                Guild.All_Guild.put(s,new Guild_Struct(s, Owner, VIP, people));
+                boolean pvp=Guild_Yaml.getBoolean(s+".PVP");
+                Guild.All_Guild.put(s,new Guild_Struct(s, Owner, VIP, people,pvp));
                 Guild.Guild_Any_Owner.add(Owner);
                 Guild.Guild_Any_VIP.add(Owner);
                 Guild.Guild_Any_People.add(Owner);
