@@ -1,10 +1,7 @@
-package cn._Guild;
+package cn.Guild;
 
 import java.util.List;
 
-/**
- * Created by key_q on 2016/3/22.
- */
 public class Guild_Struct {
     private String Guild_Name;
     private String Owner;

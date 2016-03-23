@@ -1,5 +1,5 @@
 name: Guild
-main: cn.Guild
+main: cn.Guild_Launch
 version: 1.0
 author: key_q
 commands:

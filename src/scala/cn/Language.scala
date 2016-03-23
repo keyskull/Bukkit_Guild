@@ -12,7 +12,7 @@ import scala.collection.mutable
 /**
   * Created by key_q on 2016/3/19.
   */
-class Language(guild: Guild,language: String) {
+class Language(guild: Guild_Launch,language: String) {
   val language_folder= new File(guild.getDataFolder,"language")
   Language.bar_macros("file")=language+".yml"
     if(language_folder.mkdir){
@@ -42,7 +42,8 @@ object Language{
     "Not_func"->"没有这个指令",
     "No_Permission_For"->"%1% 没有这个权限",
     "Have_Guild"->"你已经在一个公会里了.",
-    "Guild_Created"->"成功创建公会."
+    "Guild_Created"->"成功创建公会.",
+    "Failed"->"操作失败"
   )
   private lazy val regex="""%\w+%""".r
   def set_macro(macros:String,value:String):Unit= bar_macros(macros)=value
