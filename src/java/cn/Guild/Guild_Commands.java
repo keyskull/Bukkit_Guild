@@ -63,7 +63,7 @@ public class Guild_Commands implements CommandExecutor {
         permission_map.put("kick", "Guild.VIP.kick");
         permission_map.put("invite", "Guild.VIP.invite");
         permission_map.put("cz", "Guild.People.cz");
-        permission_map.put("up", "Guild.VIP.up");
+        permission_map.put("up", "Guild.Owner.up");
         permission_map.put("sj", "Guild.Owner.sj");
         permission_map.put("jj", "Guild.Owner.jj");
         permission_map.put("jn", "Guild.People.jn");
@@ -82,10 +82,10 @@ public class Guild_Commands implements CommandExecutor {
             if (Guild.isVIP(player.getName())) {
                 player.sendMessage(Language.get_bar(show_info.get("kick")));
                 player.sendMessage(Language.get_bar(show_info.get("invite")));
-                player.sendMessage(Language.get_bar(show_info.get("up")));
                 player.sendMessage(Language.get_bar(show_info.get("jieshou")));
                 player.sendMessage(Language.get_bar(show_info.get("pvp")));
                 if (Guild.isOwner(player.getName())) {
+                    player.sendMessage(Language.get_bar(show_info.get("up")));
                     player.sendMessage(Language.get_bar(show_info.get("sj")));
                     player.sendMessage(Language.get_bar(show_info.get("jj")));
                     player.sendMessage(Language.get_bar(show_info.get("claim")));
@@ -93,7 +93,7 @@ public class Guild_Commands implements CommandExecutor {
                     player.sendMessage(Language.get_bar(show_info.get("jiesan")));
                     player.sendMessage(Language.get_bar(show_info.get("zr")));
                 } else player.sendMessage(Language.get_bar(show_info.get("leave")));
-            }
+            }else player.sendMessage(Language.get_bar(show_info.get("leave")));
             player.sendMessage(Language.get_bar(show_info.get("cz")));
             player.sendMessage(Language.get_bar(show_info.get("jn")));
             player.sendMessage(Language.get_bar(show_info.get("home")));
@@ -250,30 +250,27 @@ public class Guild_Commands implements CommandExecutor {
         return true;
     }
     public Boolean invade(Player player,String[] args) {
-        if(Guild.isOwner(player.getName())){
 
-        }
         return true;
     }
     public Boolean sj(Player player,String[] args) {
-        if(Guild.isOwner(player.getName())){
-            Guild.People_Upgrade(args[1]);
-            player.sendMessage(Language.get_bar("sj_Success"));
-            return true;
-        }else {
+        if(Guild.People_Upgrade(args[1])) {
+                player.sendMessage(Language.get_bar("sj_Success"));
+                return true;
+            }else {
             player.sendMessage(Language.get_bar("Failed"));
             return false;
         }
     }
     public Boolean jj(Player player,String[] args) {
-        if(Guild.isOwner(player.getName())){
-            Guild.People_Downgrade(args[1]);
-            player.sendMessage(Language.get_bar("jj_Success"));
-            return true;
-        }else {
-            player.sendMessage(Language.get_bar("Failed"));
-            return false;
-        }
+            if(Guild.People_Downgrade(args[1])){
+                player.sendMessage(Language.get_bar("jj_Success"));
+                return true;
+            }
+            else {
+                player.sendMessage(Language.get_bar("Failed"));
+                return false;
+            }
     }
     public Boolean claim(Player player,String[] args) {
         return true;
@@ -285,6 +282,9 @@ public class Guild_Commands implements CommandExecutor {
         return true;
     }
     public Boolean pvp(Player player,String[] args) {
+            if(Guild.setPVP(Guild.getGuild_Name(player.getName()))){
+                player.sendMessage(Language.get_bar("Guild_PVP_Open"));
+            }else player.sendMessage(Language.get_bar("Guild_PVP_Close"));
         return true;
     }
     public Boolean zr(Player player,String[] args) {
@@ -292,10 +292,13 @@ public class Guild_Commands implements CommandExecutor {
     }
 
     public Boolean list(Player player,String[] args) {
-        if (player.hasPermission("Guild.basic.list") && args[1].equals("all")) {
+        if (args[1].equals("all")) {
             for(String s:Guild.Get_Guild_Data().keySet())player.sendRawMessage(s);
             return true;
-        }else return false;
+        }else{
+
+        }
+        return false;
     }
 
 

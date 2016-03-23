@@ -25,8 +25,12 @@ public class Guild {
 
     public Boolean HasGuild(String Guild_Name){return All_Guild.containsKey(Guild_Name);}
     public boolean isPVP(String Guild_name){
-
-        return true;
+        if(All_Guild.containsKey(Guild_name)) return  All_Guild.get(Guild_name).getPVP();
+        else return false;
+    }
+    public boolean setPVP(String Guild_name){
+        if(All_Guild.containsKey(Guild_name)) return  All_Guild.get(Guild_name).Change_PVP();
+        else return false;
     }
 
 
@@ -76,7 +80,6 @@ public class Guild {
 
 
     //People operation first//
-
     public boolean inGuild(String player_name){
         return Guild_Any_People.contains(player_name.toLowerCase());
     }

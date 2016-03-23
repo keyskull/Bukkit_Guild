@@ -38,6 +38,10 @@ public class Guild_Struct {
         return Guild_Name;
     }
 
+    public Boolean getPVP()  {
+        return PVP;
+    }
+
     public Boolean addPeople(String play_name) {
         return this.People.add(play_name.toLowerCase());
     }
@@ -53,7 +57,10 @@ public class Guild_Struct {
     public Boolean delVIP(String play_name) {
         return this.VIP.remove(play_name.toLowerCase());
     }
-    public Boolean Change_PVP(){
+
+
+
+        public Boolean Change_PVP(){
         if(PVP)PVP=false;
         else PVP=true;
         return PVP;
