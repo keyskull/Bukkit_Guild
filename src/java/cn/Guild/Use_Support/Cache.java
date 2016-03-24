@@ -1,8 +1,7 @@
-package cn.Guild;
+package cn.Guild.Use_Support;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Created by key_q on 2016/3/23.
@@ -29,18 +28,18 @@ public class Cache {
 
 
         // online cache first//
-    protected Boolean addOnline_People_Data(Map<String,Guild_Position_Struct> online_player_data){
+    public Boolean addOnline_People_Data(Map<String,Guild_Position_Struct> online_player_data){
         if(online_player_data ==null)return false;
         Online_People_Fast_Seach.putAll(online_player_data);
         return true;
     }
-    protected Boolean setOnline_People_Data(String player_name,Guild_Position_Struct gps){
+    public Boolean setOnline_People_Data(String player_name,Guild_Position_Struct gps){
         if(Online_People_Fast_Seach.containsKey(player_name)){
             Online_People_Fast_Seach.put(player_name,gps);
             return true;
         }else return false;
     }
-    protected Boolean delOnline_People_Data(String player_name){
+    public Boolean delOnline_People_Data(String player_name){
         if(!Online_People_Fast_Seach.containsKey(player_name))return false;
         else Online_People_Fast_Seach.remove(player_name);
         return true;

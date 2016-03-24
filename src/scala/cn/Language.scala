@@ -15,7 +15,8 @@ import scala.collection.mutable
 class Language(guild: Guild_Launch,language: String) {
   val language_folder= new File(guild.getDataFolder,"language")
   Language.bar_macros("file")=language+".yml"
-    if(language_folder.mkdir){
+    if(!language_folder.exists()){
+      language_folder.mkdir
       val Yaml=new YamlConfiguration()
       Language.bars.foreach(f =>Yaml.set(f._1,f._2))
       Yaml.formatted("UTF-8")
@@ -43,7 +44,9 @@ object Language{
     "No_Permission_For"->"%1% 没有这个权限",
     "Have_Guild"->"你已经在一个公会里了.",
     "Guild_Created"->"成功创建公会.",
-    "Failed"->"操作失败"
+    "Failed"->"操作失败",
+    "Save_File_Success"->"自动保存成功",
+    "Set_Home_For"->"家的坐标为: %1% "
   )
   private lazy val regex="""%\w+%""".r
   def set_macro(macros:String,value:String):Unit= bar_macros(macros)=value
@@ -51,7 +54,7 @@ object Language{
   def get_bar(bar:String):String={
     val bar_string =try{ Language.bars(bar)}catch{case ex:Exception => bar }
     var result=bar_string
-    for(match_string <- regex.findAllIn(bar_string))yield
+    for(match_string <- regex.findAllIn(bar_string).toIterable)yield
       result = match_string.r.replaceFirstIn(result,bar_macros(match_string))
     return result
   }
@@ -60,7 +63,7 @@ object Language{
     bar_macros("%1%")=pre;
     val bar_string =try{ Language.bars(bar)}catch{case ex:Exception => bar }
     var result=bar_string
-    for(match_string <- regex.findAllIn(bar_string))yield
+    for(match_string <- regex.findAllIn(bar_string).toIterable)yield
       result = match_string.r.replaceFirstIn(result,bar_macros(match_string))
     return result
   }

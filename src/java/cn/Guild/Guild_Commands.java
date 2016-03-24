@@ -1,9 +1,11 @@
 package cn.Guild;
 
 
+import cn.Guild.Use_Support.*;
 import cn.Guild_Launch;
 import cn.Language;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -22,9 +24,11 @@ public class Guild_Commands implements CommandExecutor {
     private Guild Guild;
     private Logger log;
     private Economy econ;
-    private Invite Invite;
-    private Contribution Contribution;
+    private cn.Guild.Use_Support.Invite Invite;
+    private cn.Guild.Use_Support.Contribution Contribution;
     private Guild_Level guild_level;
+    private Guild_Territory Guild_Territory;
+    private cn.Guild.Use_Support.Guild_Home Guild_Home;
     public Guild_Commands(Guild_Setup setup) {
         guild_level=setup.Guild_Level;
         Contribution=setup.contribution;
@@ -32,6 +36,8 @@ public class Guild_Commands implements CommandExecutor {
         econ=setup.econ;
         log=setup.log;
         Guild=setup.Guild;
+        Guild_Home=setup.Guild_Home;
+        Guild_Territory =setup.Guild_Territory;
         show_info.put("_help", "Guild_help_Info");
         show_info.put("create", "Guild_create_Info");
         show_info.put("join", "Guild_join_Info");
@@ -181,10 +187,13 @@ public class Guild_Commands implements CommandExecutor {
                 player.sendMessage(Language.get_bar("Have_Guild"));
                 return false;
             }else if(Guild.Add_Guild(player.getName(),args[1])){
-                player.sendMessage(Language.get_bar("Guild.create","Guild_Created"));
+                player.sendMessage(Language.get_bar("Guild_Created"));
                 return true;
+            }else {
+                player.sendMessage(Language.get_bar("Failed"));
+                return false;
+
             }
-            return false;
     }
 
     public Boolean jiesan(Player player) {
@@ -243,17 +252,25 @@ public class Guild_Commands implements CommandExecutor {
             guild_level.Up_Guild_Level(args[1]);
         return true;
     }
-    public Boolean js(Player player,String[] args) {
+    public Boolean jieshou(Player player,String[] args) {
+
+
         return true;
     }
-    public Boolean jn(Player player,String[] args) {
-        return true;
-    }
+
     public Boolean invade(Player player,String[] args) {
 
         return true;
     }
-    public Boolean sj(Player player,String[] args) {
+
+
+    public Boolean jn(Player player,String[] args) {
+
+
+        return true;
+    }
+
+    public Boolean sj(Player player,String[] args) {//not_test
         if(Guild.People_Upgrade(args[1])) {
                 player.sendMessage(Language.get_bar("sj_Success"));
                 return true;
@@ -262,7 +279,8 @@ public class Guild_Commands implements CommandExecutor {
             return false;
         }
     }
-    public Boolean jj(Player player,String[] args) {
+
+    public boolean jj(Player player,String[] args) {//not_test
             if(Guild.People_Downgrade(args[1])){
                 player.sendMessage(Language.get_bar("jj_Success"));
                 return true;
@@ -272,22 +290,53 @@ public class Guild_Commands implements CommandExecutor {
                 return false;
             }
     }
-    public Boolean claim(Player player,String[] args) {
+
+    public boolean claim(Player player,String[] args) {//not_test
+        if(Guild_Territory.Create_Territory(Guild.getGuild_Name(player.getName()),player.getBedSpawnLocation())){
+
+            player.sendMessage(Language.get_bar("Set_Home_Success"));
+            return true;
+        }else {
+            player.sendMessage(Language.get_bar("Failed"));
+        }
         return true;
     }
-    public Boolean sethome(Player player,String[] args) {
-        return true;
+
+    public Boolean sethome(Player player) {
+        Index index =new Index(player.getLocation().getX(),player.getLocation().getY(),player.getLocation().getZ());
+        if(Guild_Home.Set_Home(Guild.getGuild_Name(player.getName()),index)){
+            player.sendMessage(Language.get_bar("Set_Home_Success"));
+            player.sendMessage(Language.get_bar((int)index.x+":"+(int)index.y+":"+(int)index.z,"Set_Home_For"));
+
+            return true;
+        }else {
+            player.sendMessage(Language.get_bar("Failed"));
+            return false;
+        }
     }
-    public Boolean home(Player player,String[] args) {
-        return true;
+
+    public Boolean home(Player player) {
+        Index index=Guild_Home.Get_Home(Guild.getGuild_Name(player.getName()));
+        if(index!=null){
+            player.teleport(new Location(player.getWorld(),index.x,index.y,index.z,player.getLocation().getYaw(),player.getLocation().getPitch()));
+            player.sendMessage(Language.get_bar("Go_Home_Success"));
+            player.sendMessage(Language.get_bar((int)index.x+":"+(int)index.y+":"+(int)index.z,"Set_Home_For"));
+            return true;
+        }else {
+            player.sendMessage(Language.get_bar("Go_Home_Faild"));
+            return false;
+        }
     }
-    public Boolean pvp(Player player,String[] args) {
+
+    public Boolean pvp(Player player) {
             if(Guild.setPVP(Guild.getGuild_Name(player.getName()))){
                 player.sendMessage(Language.get_bar("Guild_PVP_Open"));
             }else player.sendMessage(Language.get_bar("Guild_PVP_Close"));
         return true;
     }
     public Boolean zr(Player player,String[] args) {
+
+
         return true;
     }
 

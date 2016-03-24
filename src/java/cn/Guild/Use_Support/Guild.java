@@ -1,5 +1,8 @@
-package cn.Guild;
+package cn.Guild.Use_Support;
 
+
+import cn.Guild.Guild_Setup;
+import cn.Guild.Guild_Struct;
 
 import java.util.*;
 
@@ -23,13 +26,17 @@ public class Guild {
         return All_Guild;
     }
 
-    public Boolean HasGuild(String Guild_Name){return All_Guild.containsKey(Guild_Name);}
+    public boolean HasGuild(String Guild_Name){return All_Guild.containsKey(Guild_Name);}
     public boolean isPVP(String Guild_name){
         if(All_Guild.containsKey(Guild_name)) return  All_Guild.get(Guild_name).getPVP();
         else return false;
     }
     public boolean setPVP(String Guild_name){
-        if(All_Guild.containsKey(Guild_name)) return  All_Guild.get(Guild_name).Change_PVP();
+        if(All_Guild.containsKey(Guild_name)){
+            boolean pvp =All_Guild.get(Guild_name).Change_PVP();
+             Guild_Setup.Get_Guidl_Yaml(Guild_name).set(Guild_name+".PVP",pvp);
+            return pvp;
+        }
         else return false;
     }
 
@@ -50,18 +57,14 @@ public class Guild {
     }
 
     public boolean Remove_Guild(String owner){
-        for(Guild_Struct g: All_Guild.values())
-            if(g.getOwner().equals(owner.toLowerCase())){
-                Guild_Setup.Get_Guidl_Yaml().set(g.getGuild_Name(), null);
-                All_Guild.remove(g);
-                Guild_Any_Owner.remove(owner.toLowerCase());
-                Guild_Any_VIP.remove(owner.toLowerCase());
-                Guild_Any_People.remove(owner.toLowerCase());
-                for(String s :g.getVIP())Guild_Any_VIP.remove(s.toLowerCase());
-                for(String s :g.getPeople())Guild_Any_People.remove(s.toLowerCase());
-                return true;
-            }
-        return false;
+        Guild_Setup.Get_Guidl_Yaml(getGuild_Name(owner)).set(getGuild_Name(owner), null);
+        Guild_Any_Owner.remove(owner.toLowerCase());
+        Guild_Any_VIP.remove(owner.toLowerCase());
+        Guild_Any_People.remove(owner.toLowerCase());
+        for(String s :All_Guild.get(getGuild_Name(owner)).getVIP())Guild_Any_VIP.remove(s.toLowerCase());
+        for(String s :All_Guild.get(getGuild_Name(owner)).getPeople())Guild_Any_People.remove(s.toLowerCase());
+        All_Guild.remove(getGuild_Name(owner));
+        return true;
     }
 
     public boolean Add_Guild(final String owner, final String Guild_name) {
@@ -71,9 +74,9 @@ public class Guild {
         Guild_Any_People.add(owner.toLowerCase());
         Guild_Any_VIP.add(owner.toLowerCase());
         Guild_Any_Owner.add(owner.toLowerCase());
-        Guild_Setup.Get_Guidl_Yaml().set(Guild_name+".Owner",owner);
-        Guild_Setup.Get_Guidl_Yaml().set(Guild_name+".Level",1);
-        Guild_Setup.Get_Guidl_Yaml().set(Guild_name+".PVP",false);
+        Guild_Setup.Get_Guidl_Yaml(Guild_name).set(Guild_name+".Owner",owner);
+        Guild_Setup.Get_Guidl_Yaml(Guild_name).set(Guild_name+".Level",1);
+        Guild_Setup.Get_Guidl_Yaml(Guild_name).set(Guild_name+".PVP",false);
         return true;
     }
     //Guild operation end//
@@ -87,7 +90,8 @@ public class Guild {
         return Guild_Any_VIP.contains(player_name.toLowerCase());
     }
     public boolean isOwner(String player_name){return Guild_Any_Owner.contains(player_name.toLowerCase());}
-    protected Map<String,Guild_Position_Struct> Slow_Seach_People(String name){
+
+    public Map<String,Guild_Position_Struct> Slow_Seach_People(String name){
         final String player_name=name.toLowerCase();
         for(final Guild_Struct g:  All_Guild.values())
             if(g.getOwner().equals(player_name))return new HashMap<String,Guild_Position_Struct>(){{put(player_name ,new Guild_Position_Struct(Guild_Position.Owner,g.getGuild_Name()));}};
@@ -96,14 +100,14 @@ public class Guild {
         return null;
     }
 
-    public boolean Add_People(String p_name,String Guild_Name){
+    public boolean Add_People(String p_name,String Guild_name){
         String player_name=p_name.toLowerCase();
         if(!this.inGuild(player_name)){
-           if(All_Guild.containsKey(Guild_Name)){
-               All_Guild.get(Guild_Name).addPeople(player_name.toLowerCase());
+           if(All_Guild.containsKey(Guild_name)){
+               All_Guild.get(Guild_name).addPeople(player_name.toLowerCase());
                cache.setOnline_People_Data(player_name,new Guild_Position_Struct(Guild_Position.People,player_name.toLowerCase()));
-               Guild_Setup.Get_Guidl_Yaml().set(Guild_Name+".People",
-                       Guild_Setup.Get_Guidl_Yaml().getStringList(Guild_Name+".People")
+               Guild_Setup.Get_Guidl_Yaml(Guild_name).set(Guild_name+".People",
+                       Guild_Setup.Get_Guidl_Yaml(Guild_name).getStringList(Guild_name+".People")
                                .add(player_name.toLowerCase()));
                return true;
            }else return false;
@@ -126,7 +130,7 @@ public class Guild {
     public boolean Remove_People(String player_name){
         return Kick_People(player_name,getGuild_Name(player_name));
     }
-    public boolean Kick_People(String p_name,String Guild_Name){
+    public boolean Kick_People(String p_name,String Guild_name){
         String player_name=p_name.toLowerCase();
         if(!this.isOwner(player_name))
             for(Guild_Struct g:All_Guild.values())
@@ -134,14 +138,14 @@ public class Guild {
                     g.delPeople(player_name);
                     Guild_Any_People.remove(player_name.toLowerCase());
                     cache.setOnline_People_Data(player_name,null);
-                    Guild_Setup.Get_Guidl_Yaml().set(Guild_Name+".People"+"."+player_name, null);
+                    Guild_Setup.Get_Guidl_Yaml(Guild_name).set(Guild_name+".People"+"."+player_name, null);
                     return true;
                 }else if(g.getVIP().contains(player_name)){
                     g.delVIP(player_name);
                     Guild_Any_VIP.remove(player_name);
                     Guild_Any_People.remove(player_name);
                     cache.setOnline_People_Data(player_name,null);
-                    Guild_Setup.Get_Guidl_Yaml().set(Guild_Name+".VIP"+"."+player_name , null);
+                    Guild_Setup.Get_Guidl_Yaml(Guild_name).set(Guild_name+".VIP"+"."+player_name , null);
                     return true;
                 }else return false;
         return false;
