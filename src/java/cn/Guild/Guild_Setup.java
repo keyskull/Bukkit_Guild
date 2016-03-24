@@ -7,7 +7,9 @@ import cn.Language;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -26,37 +28,24 @@ public class Guild_Setup {
     public static Permission perms = null;
     public static Chat chat = null;
     private static Guild_Launch plugin =null;
-    private static YamlConfiguration Guild_Yaml=null;
     private static Map<String,YamlConfiguration> Guild_Yaml_Data_File_Map = new HashMap<>();
-    public static File DataFolder=null;
-    public final cn.Guild.Use_Support.Invite Invite=new Invite();
+    private static File DataFolder=null;
     public final Cache Cache=new Cache();
-    public final Contribution contribution=new Contribution();
+    public final Contribution contribution=new Contribution(Cache);
+    public final Invite Invite=new Invite(Cache);
     public final Guild_Level Guild_Level=new Guild_Level(Cache);
     public final Guild Guild=new Guild(Cache);
     public final cn.Guild.Use_Support.Guild_Skull Guild_Skull=new Guild_Skull(Cache);
     public final Guild_Territory Guild_Territory=new Guild_Territory(Cache);
     public final cn.Guild.Use_Support.Guild_Home Guild_Home=new Guild_Home(Cache);
-    public Guild_Setup(Guild_Launch guild_launch) throws IOException {
+
+    public Guild_Setup(Guild_Launch guild_launch) {
         this.plugin=guild_launch;
         this.DataFolder=plugin.getDataFolder();
         this.log=guild_launch.getLogger();
-        this.setupGuild_Data();
-        this.Save_Guild_Data();
-        new BukkitRunnable() {
-            int time = (int)Guild_Launch.get_Config_asJava().get("auto_save");
-            @Override
-            public void run() {
-                if(--time < 0) {
-                    Guild_Setup.Save_Guild_Data();
-                    plugin.getLogger().info(Language.get_bar("Save_File_Success"));
-                    time = (int)Guild_Launch.get_Config_asJava().get("auto_save");
-                }
-            }
-        }.runTaskTimer(plugin, 0L, 20L);
     }
 
-    public static YamlConfiguration Get_Guidl_Yaml(String Guild_Name){
+    public static YamlConfiguration Get_Guild_Yaml(String Guild_Name){
         if(Guild_Yaml_Data_File_Map.containsKey(Guild_Name))
         return Guild_Yaml_Data_File_Map.get(Guild_Name);
         else{
@@ -65,7 +54,6 @@ public class Guild_Setup {
                     file.createNewFile();
                     Guild_Yaml_Data_File_Map.put(Guild_Name, YamlConfiguration.loadConfiguration(file));
                     return Guild_Yaml_Data_File_Map.get(Guild_Name);
-
             }catch (IOException ex){
                 plugin.getLogger().warning(Language.get_bar(Guild_Name+".yml","Load_File_Error"));
             }
@@ -86,22 +74,25 @@ public class Guild_Setup {
     }
 
 
-    private boolean setupGuild_Data() throws IOException {
+    public boolean setupLoad_Guild_Data()  {
+        Set<String> VIP,people;
         File file=new File(Guild_Setup.DataFolder,"Guild_Data");
         if(file.exists()){
             for(File f :file.listFiles())
                 if (f.isFile()) {
-                    if (f.length() == 0) {
-                        f.delete();
-                        continue;
-                    }
+                    if (f.length() == 0) {f.delete();continue;}
                     final String[] path = f.getName().split("\\\\");
                     final String s = path[path.length - 1].split("\\.")[0];
                     Guild_Yaml_Data_File_Map.put(s, YamlConfiguration.loadConfiguration(f));
                     YamlConfiguration Guild_Yaml = YamlConfiguration.loadConfiguration(f);
-                    String Owner = Guild_Yaml.getString(s + ".Owner");
-                    List<String> VIP = Guild_Yaml.getStringList(s + ".CEO");
-                    List<String> people = Guild_Yaml.getStringList(s + ".People");
+                    String Owner="";
+                    for(String owner :Guild_Yaml.getConfigurationSection(s + ".Owner").getKeys(false))Owner=owner;
+                    ConfigurationSection vip_config= Guild_Yaml.getConfigurationSection(s + ".VIP");
+                    if(vip_config != null) VIP = vip_config.getKeys(false);
+                    else VIP=new HashSet<>();
+                    ConfigurationSection people_config= Guild_Yaml.getConfigurationSection(s + ".People");
+                    if(people_config != null) people = people_config.getKeys(false);
+                    else people=new HashSet<>();
                     boolean pvp = Guild_Yaml.getBoolean(s + ".PVP");
                     final Set<Index> territory = new HashSet<>();
                     for (String ss : Guild_Yaml.getStringList(s + ".Territory")) {
@@ -112,9 +103,7 @@ public class Guild_Setup {
                         cordinates.z = Double.valueOf(index[0]);
                         territory.add(cordinates);
                     }
-                    Guild_Territory.Territory_cache.putAll(new HashMap<String, Set<Index>>() {{
-                        put(s, territory);
-                    }});
+                    Guild_Territory.Territory_cache.putAll(new HashMap<String, Set<Index>>() {{put(s, territory);}});
                     Guild.All_Guild.put(s, new Guild_Struct(s, Owner, VIP, people, pvp));
                     Guild.Guild_Any_Owner.add(Owner);
                     Guild.Guild_Any_VIP.add(Owner);
@@ -124,10 +113,23 @@ public class Guild_Setup {
                         Guild.Guild_Any_People.add(dd);
                     }
                     for (String ss : people) Guild.Guild_Any_People.add(ss);
-
                 }
-
-        }else file.mkdir();
+            }else file.mkdir();
+        return true;
+    }
+    public boolean setupEnable(){
+        new BukkitRunnable() {
+            int time = (int)Guild_Launch.get_Config_asJava().get("auto_save");
+            @Override
+            public void run() {
+                if(--time < 0) {
+                    Guild_Setup.Save_Guild_Data();
+                    plugin.getLogger().info(Language.get_bar("Save_File_Success"));
+                    time = (int)Guild_Launch.get_Config_asJava().get("auto_save");
+                }
+            }
+        }.runTaskTimer(plugin, 0L, 20L);
+        this.Save_Guild_Data();
         return true;
     }
 
@@ -155,4 +157,13 @@ public class Guild_Setup {
         return perms != null;
     }
 
+    private void loadEssentialsEconomy() {
+        Plugin p = plugin.getServer().getPluginManager().getPlugin("Residence");
+        if (p != null) {
+
+            plugin.getLogger().log(Level.INFO, "Successfully linked with Residence!");
+        } else {
+            plugin.getLogger().log(Level.INFO, "Residence NOT found!");
+        }
+    }
 }

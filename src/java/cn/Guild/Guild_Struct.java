@@ -1,21 +1,22 @@
 package cn.Guild;
 
 import java.util.List;
+import java.util.Set;
 
 public class Guild_Struct {
     private String Guild_Name;
     private String Owner;
-    private List<String> VIP;
-    private List<String> People;
+    private Set<String> VIP;
+    private Set<String> People;
     private Boolean PVP=false;
-    public Guild_Struct(String Guild_Name, String Owner, List<String> VIP, List<String> People,Boolean PVP) {
+    public Guild_Struct(String Guild_Name, String Owner, Set<String> VIP, Set<String> People,Boolean PVP) {
         this.Guild_Name = Guild_Name;
         this.Owner = Owner.toLowerCase();
         this.VIP = VIP;
         this.People = People;
         this.PVP=PVP;
     }
-    public Guild_Struct(String Guild_Name, String Owner, List<String> VIP, List<String> People) {
+    public Guild_Struct(String Guild_Name, String Owner, Set<String> VIP, Set<String> People) {
         this.Guild_Name = Guild_Name;
         this.Owner = Owner.toLowerCase();
         this.VIP = VIP;
@@ -26,11 +27,11 @@ public class Guild_Struct {
         return Owner;
     }
 
-    public List<String> getVIP() {
+    public Set<String> getVIP() {
         return VIP;
     }
 
-    public List<String> getPeople() {
+    public Set<String> getPeople() {
         return People;
     }
 
@@ -38,29 +39,32 @@ public class Guild_Struct {
         return Guild_Name;
     }
 
-    public Boolean getPVP()  {
+    public boolean getPVP()  {
         return PVP;
     }
 
-    public Boolean addPeople(String play_name) {
+    public boolean addPeople(String play_name) {
         return this.People.add(play_name.toLowerCase());
     }
 
-    public Boolean addVIP(String play_name) {
+    public boolean addVIP(String play_name) {
         return this.VIP.add(play_name.toLowerCase());
     }
 
-    public Boolean delPeople(String play_name) {
+    public boolean delPeople(String play_name) {
         return this.People.remove(play_name.toLowerCase());
     }
 
-    public Boolean delVIP(String play_name) {
+    public boolean delVIP(String play_name) {
         return this.VIP.remove(play_name.toLowerCase());
     }
 
+    public boolean isVIP(String play_name){return this.VIP.contains(play_name.toLowerCase()); }
 
+    public boolean isPeople(String play_name){return this.People.contains(play_name.toLowerCase()); }
 
-        public Boolean Change_PVP(){
+    public void Change_Owner(String play_name){this.Owner=play_name.toLowerCase();}
+    public boolean Change_PVP(){
         if(PVP)PVP=false;
         else PVP=true;
         return PVP;

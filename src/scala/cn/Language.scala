@@ -34,6 +34,9 @@ class Language(guild: Guild_Launch,language: String) {
 object Language{
   private lazy val bar_macros:mutable.Map[String,String]=mutable.Map()
   private lazy val bars:mutable.Map[String,String]=mutable.Map(
+    "People"->"会员",
+    "Owner"->"会长",
+    "VIP"->"长老",
     "Finish_Load_Config"->"读取配置完成.",
     "No_Lang"->" %file% 没有这个语言文件.",
     "Guild_create_Info" ->"创建 /guild create <公会名>  玩家可创建公会，创建公会需消耗金币%money% ",
@@ -42,11 +45,17 @@ object Language{
     "Guild_help_Info"->"帮助说明",
     "Not_func"->"没有这个指令",
     "No_Permission_For"->"%1% 没有这个权限",
+    "Not_enough_money "->"你不够钱",
     "Have_Guild"->"你已经在一个公会里了.",
     "Guild_Created"->"成功创建公会.",
     "Failed"->"操作失败",
     "Save_File_Success"->"自动保存成功",
-    "Set_Home_For"->"家的坐标为: %1% "
+    "Set_Home_For"->"家的坐标为: %1% ",
+    "Guild_home_Info"->"传送会公会 /guild home 仅公会下成员可使用",
+    "You_Guild"->"你所在的公会",
+    "You_Position"->"你的职位是",
+    "You_Contribution"->"你已为这个公会赞助了",
+    "Guild_Level"->"公会等级"
   )
   private lazy val regex="""%\w+%""".r
   def set_macro(macros:String,value:String):Unit= bar_macros(macros)=value
