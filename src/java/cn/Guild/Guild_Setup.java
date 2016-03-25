@@ -4,12 +4,14 @@ package cn.Guild;
 import cn.Guild.Use_Support.*;
 import cn.Guild_Launch;
 import cn.Language;
+import com.bekvon.bukkit.residence.protection.FlagPermissions;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -117,6 +119,7 @@ public class Guild_Setup {
             }else file.mkdir();
         return true;
     }
+
     public boolean setupEnable(){
         new BukkitRunnable() {
             int time = (int)Guild_Launch.get_Config_asJava().get("auto_save");
@@ -141,6 +144,22 @@ public class Guild_Setup {
         return econ != null;
     }
 
+    public void loadResidence() {
+        PluginManager pm = plugin.getServer().getPluginManager();
+        Plugin p = pm.getPlugin("Residence");
+        if(p!=null) {
+            if(!p.isEnabled()) {
+                plugin.getLogger().info(" - Manually Enabling Residence!");
+                pm.enablePlugin(p);
+            }
+        }
+        else {
+            plugin.getLogger().warning(" - Residence NOT Installed, DISABLED!");
+            //   plugin.setEnabled(false);
+        }
+    }
+
+/*
     public boolean setupChat() {
         RegisteredServiceProvider<Chat> rsp = plugin.getServer().getServicesManager().getRegistration(Chat.class);
         try {
@@ -156,14 +175,6 @@ public class Guild_Setup {
         perms = rsp.getProvider();
         return perms != null;
     }
+*/
 
-    private void loadEssentialsEconomy() {
-        Plugin p = plugin.getServer().getPluginManager().getPlugin("Residence");
-        if (p != null) {
-
-            plugin.getLogger().log(Level.INFO, "Successfully linked with Residence!");
-        } else {
-            plugin.getLogger().log(Level.INFO, "Residence NOT found!");
-        }
-    }
 }

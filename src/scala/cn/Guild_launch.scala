@@ -13,6 +13,8 @@ import scala.collection.mutable
 
 class Guild_Launch extends JavaPlugin{
   val select_language =new Language(this,_:String)
+  val setup=new Guild_Setup(this)
+
   override  def onLoad(): Unit ={
     val config_file=  new File(getDataFolder,"config.yml")
     this.getDataFolder.mkdir()
@@ -22,12 +24,13 @@ class Guild_Launch extends JavaPlugin{
     saveConfig
     select_language(Guild_Launch.config("language").asInstanceOf[String])
     Language.set_macro("%money%",Guild_Launch.config.get("Create_Guild_Money").get.toString)
+    setup.setupLoad_Guild_Data
     getLogger.info(Language.get_bar("Finish_Load_Config"))
-
   }
   override def onEnable():Unit= {
-    val setup=new Guild_Setup(this)
+    setup.setupEnable
     setup.setupEconomy
+    setup.loadResidence
     this.getCommand("Guild").setExecutor(new Guild_Commands(setup))
     this.getServer.getPluginManager.registerEvents(new cn.Guild.Guild_Listener(setup), this);
 

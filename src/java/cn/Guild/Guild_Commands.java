@@ -216,9 +216,6 @@ public class Guild_Commands implements CommandExecutor {
         return find;
     }
 
-    public Boolean kick(Player player,String[] args) {
-        return  Guild.Kick_People(args[0],Guild.getGuild_Name(player.getName()));
-    }
     
     public Boolean invite(Player player,String[] args) {//tested
             if (Invite.add_invite(args[1], Guild.getGuild_Name(player.getName()))) {
@@ -253,8 +250,6 @@ public class Guild_Commands implements CommandExecutor {
         player.sendMessage(Language.get_bar(String.valueOf(contribution),"cz_Success"));
         return true;
     }
-
-
 
     public Boolean sj(Player player,String[] args) {//tested
         if(Guild.People_Upgrade(args[1])) {
@@ -332,14 +327,11 @@ public class Guild_Commands implements CommandExecutor {
     public boolean info(Player player) {//tested
         Guild_Position_Struct gps=cache.getOnline_People_Data(player.getName());
         String[] message={
-                Language.get_bar("You_Guild")+":",
-                gps.Guild_name,
-                Language.get_bar("You_Position")+":",
-                Language.get_bar(String.valueOf(gps.Position)),
-                Language.get_bar("Guild_Level"),
-                String.valueOf(Guild_Level.get_Guild_Level(gps.Guild_name)),
-                Language.get_bar("You_Contribution")+":",
-                String.valueOf(Contribution.Get_Contribution_info(player.getName()))
+                Language.get_bar("You_Guild")+":"+gps.Guild_name,
+                Language.get_bar("You_Position")+":"+ Language.get_bar(String.valueOf(gps.Position)),
+                Language.get_bar("Guild_Level")+":"+ String.valueOf(Guild_Level.get_Guild_Level(gps.Guild_name)),
+                Language.get_bar("You_Contribution")+":"+ String.valueOf(Contribution.Get_Contribution_info(player.getName())/10),
+                Language.get_bar("Guild_Count_Contribution")+":"+Contribution.Check_Guild_Contribution(gps.Guild_name)
         };
         player.sendMessage(message);
         return true;
@@ -349,6 +341,29 @@ public class Guild_Commands implements CommandExecutor {
 
 
         return true;
+    }
+
+    public Boolean list(Player player,String[] args) {
+        if (args[1].equals("all")) {
+            for(String s:Guild.Get_Guild_Data().keySet())player.sendRawMessage(s);
+            return true;
+        }else if(Guild.HasGuild(args[1])){
+            info(player,args);
+        }
+        return false;
+    }
+
+    public boolean up(Player player) {//tested
+        String Guild_name=Guild.getGuild_Name(player.getName());
+        int level = Guild_Level.get_Guild_Level(Guild_name);
+        if(Contribution.Check_Guild_Contribution(Guild_name)-(level*(level+1)/2)*100>(level+1)*100){
+            Guild_Level.Up_Guild_Level(Guild_name);
+            player.sendMessage(Language.get_bar("Guild_Up_Level_Success"));
+            return true;
+        }else {
+            player.sendMessage(Language.get_bar("Guild_Up_Level_Failed"));
+            return false;
+        }
     }
 
     public boolean claim(Player player,String[] args) {//not_test
@@ -362,17 +377,8 @@ public class Guild_Commands implements CommandExecutor {
         return true;
     }
 
-    public boolean up(Player player) {
-        String Guild_name=Guild.getGuild_Name(player.getName());
-        int level = Guild_Level.get_Guild_Level(Guild_name);
-        if(Contribution.Check_Guild_Contribution(Guild_name)-(level*(level+1)/2)*100>(level+1)*100){
-            Guild_Level.Up_Guild_Level(Guild_name);
-            player.sendMessage(Language.get_bar("Guild_Up_Level_Success"));
-            return true;
-        }else {
-            player.sendMessage(Language.get_bar("Guild_Up_Level_Failed"));
-            return false;
-        }
+    public Boolean kick(Player player,String[] args) {//not_test
+        return  Guild.Kick_People(args[0],Guild.getGuild_Name(player.getName()));
     }
 
     public boolean jieshou(Player player,String[] args) {
@@ -393,15 +399,7 @@ public class Guild_Commands implements CommandExecutor {
         return true;
     }
 
-    public Boolean list(Player player,String[] args) {
-        if (args[1].equals("all")) {
-            for(String s:Guild.Get_Guild_Data().keySet())player.sendRawMessage(s);
-            return true;
-        }else if(Guild.HasGuild(args[1])){
-            info(player,args);
-        }
-        return false;
-    }
+
 
 
 

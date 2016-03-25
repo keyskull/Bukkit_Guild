@@ -27,6 +27,7 @@ public class Contribution {
         if(!People_Sponsor_cache.containsKey(player_name))
             People_Sponsor_cache.put(player_name,
                 Guild_Setup.Get_Guild_Yaml(Guild_name).getInt(Guild_name+"."+guild_position+"."+player_name));
+        //wrong~~~
         return People_Sponsor_cache.get(player_name);
     }
 
@@ -73,7 +74,7 @@ public class Contribution {
             else Owner=new HashSet<>();
             for(String s:People)Count+= Guild_Yaml.getInt(Guild_name + ".People."+s);
             for(String s:VIP)Count+= Guild_Yaml.getInt(Guild_name + ".VIP."+s);
-            for(String s:People)Count+= Guild_Yaml.getInt(Guild_name + ".Owner."+s);
+            for(String s:Owner)Count+= Guild_Yaml.getInt(Guild_name + ".Owner."+s);
             Guild_Contribution_cache.put(Guild_name,Count/10);
             return Guild_Contribution_cache.get(Guild_name);
         }

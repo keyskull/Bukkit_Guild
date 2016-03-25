@@ -55,7 +55,8 @@ object Language{
     "You_Guild"->"你所在的公会",
     "You_Position"->"你的职位是",
     "You_Contribution"->"你已为这个公会赞助了",
-    "Guild_Level"->"公会等级"
+    "Guild_Level"->"公会等级",
+    "Guild_Count_Contribution"->"公会总贡献度"
   )
   private lazy val regex="""%\w+%""".r
   def set_macro(macros:String,value:String):Unit= bar_macros(macros)=value

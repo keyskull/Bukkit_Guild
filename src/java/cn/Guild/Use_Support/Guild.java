@@ -5,13 +5,16 @@ import cn.Guild.Guild_Setup;
 import cn.Guild.Guild_Struct;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-
-import javax.security.auth.login.Configuration;
 import java.util.*;
 
 /**
  * Created by key_q on 2016/3/23.
+ *
+ * 一开始写蠢左,日后扩展才将这页框架改成依赖注入
  */
+
+
+
 public class Guild {
     public Map<String,Guild_Struct> All_Guild=new HashMap<>();
     public Set<String> Guild_Any_People=new HashSet<>();
@@ -102,58 +105,68 @@ public class Guild {
         return new HashMap<String,Guild_Position_Struct>(){{put(player_name ,null);}};
     }
 
-    public boolean Change_Owner(String Owner,String Target_name){//Have_Wrong
+    public boolean Change_Owner(String Owner,String Target_name){
         final String owner=Owner.toLowerCase(),target_name=Target_name.toLowerCase();
         String Guild_name= this.getGuild_Name(owner);
         YamlConfiguration Guild_Yaml=Guild_Setup.Get_Guild_Yaml(Guild_name);
         Guild_Struct guild_struct=All_Guild.get(getGuild_Name(owner));
         if(guild_struct.isPeople(target_name)){
-            ConfigurationSection config = Guild_Yaml.getConfigurationSection(Guild_name + ".People");
-            Map<String,Object> map =config.getValues(false);
-            map.remove(target_name);
-            map.put(Owner,Contribution.Get_Contribution_info(Owner));
-            Guild_Yaml.set(Guild_name+".People",map);
-            Guild_Yaml.set(Guild_name+".Owner",new HashMap<String,Integer>(){{put(target_name,Contribution.Get_Contribution_info(target_name));}});
             guild_struct.delPeople(target_name);
             guild_struct.Change_Owner(target_name);
+            guild_struct.addPeople(Owner);
+
+            //cache
             Guild_Any_Owner.add(target_name);
             Guild_Any_VIP.add(target_name);
             Guild_Any_Owner.remove(Owner);
             Guild_Any_VIP.remove(Owner);
             cache.setOnline_People_Data(Owner,new Guild_Position_Struct(Guild_Position.People,Guild_name));
             cache.setOnline_People_Data(Target_name,new Guild_Position_Struct(Guild_Position.Owner,Guild_name));
-        }else if(guild_struct.isVIP(target_name)){
-            ConfigurationSection config = Guild_Yaml.getConfigurationSection(Guild_name + ".VIP");
-            Map<String,Object> map =config.getValues(false);
+
+            //file
+            ConfigurationSection config = Guild_Yaml.getConfigurationSection(Guild_name + ".People");
+            Map<String,Object> map =config ==null ? new HashMap<String,Object>() : config.getValues(false);
             map.remove(target_name);
             map.put(Owner,Contribution.Get_Contribution_info(Owner));
-            Guild_Yaml.set(Guild_name+".VIP",map);
+            Guild_Yaml.set(Guild_name+".People",map);
             Guild_Yaml.set(Guild_name+".Owner",new HashMap<String,Integer>(){{put(target_name,Contribution.Get_Contribution_info(target_name));}});
+
+        }else if(guild_struct.isVIP(target_name)){
             guild_struct.delVIP(target_name);
             guild_struct.Change_Owner(target_name);
+            guild_struct.addVIP(Owner);
+
+            //cache
             Guild_Any_Owner.add(target_name);
             Guild_Any_Owner.remove(Owner);
             cache.setOnline_People_Data(Owner,new Guild_Position_Struct(Guild_Position.VIP,Guild_name));
             cache.setOnline_People_Data(Target_name,new Guild_Position_Struct(Guild_Position.Owner,Guild_name));
+
+            //file
+            ConfigurationSection config = Guild_Yaml.getConfigurationSection(Guild_name + ".VIP");
+            Map<String,Object> map =config ==null ? new HashMap<String,Object>() : config.getValues(false);
+            map.remove(target_name);
+            map.put(Owner,Contribution.Get_Contribution_info(Owner));
+            Guild_Yaml.set(Guild_name+".VIP",map);
+            Guild_Yaml.set(Guild_name+".Owner",new HashMap<String,Integer>(){{put(target_name,Contribution.Get_Contribution_info(target_name));}});
         }else return false;
         return true;
     }
 
-    public boolean People_Upgrade(String Player_name){
+    public boolean People_Upgrade(String Player_name){//wrong
         String player_name=Player_name.toLowerCase();
         if(this.inGuild(player_name)) {
          String Guild_name= this.getGuild_Name(player_name);
-            if(!this.isVIP(player_name)) {
+            if(!this.isVIP(player_name) && !this.isOwner(player_name)) {
                boolean find= All_Guild.get(Guild_name).addVIP(player_name);
                 All_Guild.get(Guild_name).delPeople(player_name);
                 Guild_Any_VIP.add(player_name);
-                ConfigurationSection config = Guild_Setup.Get_Guild_Yaml(Guild_name).createSection(Guild_name + ".VIP");
-                Map<String,Object> map;
-                map =config.getValues(false);
+                ConfigurationSection config = Guild_Setup.Get_Guild_Yaml(Guild_name).getConfigurationSection(Guild_name + ".VIP");
+                Map<String,Object> map =config ==null ? new HashMap<String,Object>() : config.getValues(false);
                 map.put(player_name,0);
                 Guild_Setup.Get_Guild_Yaml(Guild_name).set(Guild_name+".VIP",map);
-                config = Guild_Setup.Get_Guild_Yaml(Guild_name).createSection(Guild_name + ".People");
-                map = config.getValues(false);
+                config = Guild_Setup.Get_Guild_Yaml(Guild_name).getConfigurationSection(Guild_name + ".People");
+                map =config ==null ? new HashMap<String,Object>() : config.getValues(false);
                 map.remove(player_name);
                 Guild_Setup.Get_Guild_Yaml(Guild_name).set(Guild_name+".People", map);
                 return  find;
@@ -162,21 +175,20 @@ public class Guild {
         }else return false;
     }
 
-    public boolean People_Downgrade(String Player_name){
+    public boolean People_Downgrade(String Player_name){//wrong
         String player_name=Player_name.toLowerCase();
         if(this.inGuild(player_name)){
             String Guild_name= this.getGuild_Name(player_name);
-            if(this.isVIP(player_name)){
+            if(this.isVIP(player_name) && !this.isOwner(player_name)){
                 boolean find= All_Guild.get(Guild_name).delVIP(player_name);
                 All_Guild.get(Guild_name).addPeople(player_name);
                 Guild_Any_VIP.remove(player_name);
-                ConfigurationSection config = Guild_Setup.Get_Guild_Yaml(Guild_name).createSection(Guild_name + ".People");
-                Map<String,Object> map;
-                map =config.getValues(false);
+                ConfigurationSection config = Guild_Setup.Get_Guild_Yaml(Guild_name).getConfigurationSection(Guild_name + ".People");
+                Map<String,Object> map =config ==null ? new HashMap<String,Object>() : config.getValues(false);
                 map.put(player_name,0);
                 Guild_Setup.Get_Guild_Yaml(Guild_name).set(Guild_name+".People",map);
-                config = Guild_Setup.Get_Guild_Yaml(Guild_name).createSection(Guild_name + ".VIP");
-                map = config.getValues(false);
+                config = Guild_Setup.Get_Guild_Yaml(Guild_name).getConfigurationSection(Guild_name + ".VIP");
+                map =config ==null ? new HashMap<String,Object>() : config.getValues(false);
                 map.remove(player_name);
                 Guild_Setup.Get_Guild_Yaml(Guild_name).set(Guild_name+".VIP", map);
                 return  find;
@@ -192,10 +204,8 @@ public class Guild {
                 All_Guild.get(Guild_name).addPeople(player_name.toLowerCase());
                 cache.setOnline_People_Data(player_name,new Guild_Position_Struct(Guild_Position.People,Guild_name));
                 Guild_Any_People.add(player_name);
-                ConfigurationSection config = Guild_Setup.Get_Guild_Yaml(Guild_name).createSection(Guild_name + ".People");
-                Map<String,Object> list;
-                if(config !=null) list =config.getValues(false);
-                else list=new HashMap<>();
+                ConfigurationSection config = Guild_Setup.Get_Guild_Yaml(Guild_name).getConfigurationSection(Guild_name + ".People");
+                Map<String,Object> list = config ==null ? new HashMap<String,Object>() : config.getValues(false);
                 list.put(player_name,0);
                 Guild_Setup.Get_Guild_Yaml(Guild_name).set(Guild_name+".People",list);
                 return true;
@@ -213,10 +223,8 @@ public class Guild {
                     g.delPeople(player_name);
                     Guild_Any_People.remove(player_name.toLowerCase());
                     cache.setOnline_People_Data(player_name,null);
-                    ConfigurationSection config = Guild_Setup.Get_Guild_Yaml(Guild_name).createSection(Guild_name + ".People");
-                    Map<String,Object> map;
-                    if(config !=null) map =config.getValues(false);
-                    else map=new HashMap<>();
+                    ConfigurationSection config = Guild_Setup.Get_Guild_Yaml(Guild_name).getConfigurationSection(Guild_name + ".People");
+                    Map<String,Object> map =config ==null ? new HashMap<String,Object>() : config.getValues(false);
                     map.remove(player_name);
                     Guild_Setup.Get_Guild_Yaml(Guild_name).set(Guild_name+".People", map);
                     return true;
@@ -225,10 +233,8 @@ public class Guild {
                     Guild_Any_VIP.remove(player_name);
                     Guild_Any_People.remove(player_name);
                     cache.setOnline_People_Data(player_name,null);
-                    ConfigurationSection config = Guild_Setup.Get_Guild_Yaml(Guild_name).createSection(Guild_name + ".VIP");
-                    Map<String,Object> map;
-                    if(config !=null) map =config.getValues(false);
-                    else map=new HashMap<>();
+                    ConfigurationSection config = Guild_Setup.Get_Guild_Yaml(Guild_name).getConfigurationSection(Guild_name + ".VIP");
+                    Map<String,Object> map =config ==null ? new HashMap<String,Object>() : config.getValues(false);
                     map.remove(player_name);
                     Guild_Setup.Get_Guild_Yaml(Guild_name).set(Guild_name+".VIP", map);
                     return true;
