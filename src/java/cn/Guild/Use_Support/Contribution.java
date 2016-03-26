@@ -27,7 +27,6 @@ public class Contribution {
         if(!People_Sponsor_cache.containsKey(player_name))
             People_Sponsor_cache.put(player_name,
                 Guild_Setup.Get_Guild_Yaml(Guild_name).getInt(Guild_name+"."+guild_position+"."+player_name));
-        //wrong~~~
         return People_Sponsor_cache.get(player_name);
     }
 

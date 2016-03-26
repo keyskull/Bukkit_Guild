@@ -1,6 +1,5 @@
 package cn.Guild;
 
-import java.util.List;
 import java.util.Set;
 
 public class Guild_Struct {

@@ -37,9 +37,10 @@ public class Guild_Setup {
     public final Invite Invite=new Invite(Cache);
     public final Guild_Level Guild_Level=new Guild_Level(Cache);
     public final Guild Guild=new Guild(Cache);
-    public final cn.Guild.Use_Support.Guild_Skull Guild_Skull=new Guild_Skull(Cache);
+    public final Guild_Skull Guild_Skull=new Guild_Skull(Cache);
     public final Guild_Territory Guild_Territory=new Guild_Territory(Cache);
-    public final cn.Guild.Use_Support.Guild_Home Guild_Home=new Guild_Home(Cache);
+    public final Guild_Home Guild_Home=new Guild_Home(Cache);
+    public static Guild_Claim Guild_Claim=null;
 
     public Guild_Setup(Guild_Launch guild_launch) {
         this.plugin=guild_launch;
@@ -151,6 +152,7 @@ public class Guild_Setup {
             if(!p.isEnabled()) {
                 plugin.getLogger().info(" - Manually Enabling Residence!");
                 pm.enablePlugin(p);
+                Guild_Claim =new Guild_Claim(Cache);
             }
         }
         else {

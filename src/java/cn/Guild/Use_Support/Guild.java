@@ -124,7 +124,7 @@ public class Guild {
             cache.setOnline_People_Data(Target_name,new Guild_Position_Struct(Guild_Position.Owner,Guild_name));
 
             //file
-            ConfigurationSection config = Guild_Yaml.getConfigurationSection(Guild_name + ".People");
+            ConfigurationSection config = Guild_Yaml.createSection(Guild_name + ".People");
             Map<String,Object> map =config ==null ? new HashMap<String,Object>() : config.getValues(false);
             map.remove(target_name);
             map.put(Owner,Contribution.Get_Contribution_info(Owner));
@@ -143,7 +143,7 @@ public class Guild {
             cache.setOnline_People_Data(Target_name,new Guild_Position_Struct(Guild_Position.Owner,Guild_name));
 
             //file
-            ConfigurationSection config = Guild_Yaml.getConfigurationSection(Guild_name + ".VIP");
+            ConfigurationSection config = Guild_Yaml.createSection(Guild_name + ".VIP");
             Map<String,Object> map =config ==null ? new HashMap<String,Object>() : config.getValues(false);
             map.remove(target_name);
             map.put(Owner,Contribution.Get_Contribution_info(Owner));
@@ -161,14 +161,15 @@ public class Guild {
                boolean find= All_Guild.get(Guild_name).addVIP(player_name);
                 All_Guild.get(Guild_name).delPeople(player_name);
                 Guild_Any_VIP.add(player_name);
-                ConfigurationSection config = Guild_Setup.Get_Guild_Yaml(Guild_name).getConfigurationSection(Guild_name + ".VIP");
-                Map<String,Object> map =config ==null ? new HashMap<String,Object>() : config.getValues(false);
-                map.put(player_name,0);
-                Guild_Setup.Get_Guild_Yaml(Guild_name).set(Guild_name+".VIP",map);
-                config = Guild_Setup.Get_Guild_Yaml(Guild_name).getConfigurationSection(Guild_name + ".People");
-                map =config ==null ? new HashMap<String,Object>() : config.getValues(false);
-                map.remove(player_name);
-                Guild_Setup.Get_Guild_Yaml(Guild_name).set(Guild_name+".People", map);
+                //wrong
+                Map<String,Integer> People_Data=new HashMap<>();
+                for(String s:All_Guild.get(Guild_name).getVIP())People_Data.put(s,Contribution.Get_Contribution_info(s));
+                People_Data.put(player_name,Contribution.Get_Contribution_info(player_name));
+                Guild_Setup.Get_Guild_Yaml(Guild_name).set(Guild_name+".VIP",People_Data);
+                People_Data=new HashMap<>();
+                for(String s:All_Guild.get(Guild_name).getPeople())People_Data.put(s,Contribution.Get_Contribution_info(s));
+                People_Data.remove(player_name);
+                Guild_Setup.Get_Guild_Yaml(Guild_name).set(Guild_name+".People", People_Data);
                 return  find;
             }
             else return false;
@@ -183,6 +184,8 @@ public class Guild {
                 boolean find= All_Guild.get(Guild_name).delVIP(player_name);
                 All_Guild.get(Guild_name).addPeople(player_name);
                 Guild_Any_VIP.remove(player_name);
+                //wrong
+                /*
                 ConfigurationSection config = Guild_Setup.Get_Guild_Yaml(Guild_name).getConfigurationSection(Guild_name + ".People");
                 Map<String,Object> map =config ==null ? new HashMap<String,Object>() : config.getValues(false);
                 map.put(player_name,0);
@@ -191,6 +194,15 @@ public class Guild {
                 map =config ==null ? new HashMap<String,Object>() : config.getValues(false);
                 map.remove(player_name);
                 Guild_Setup.Get_Guild_Yaml(Guild_name).set(Guild_name+".VIP", map);
+                */
+                Map<String,Integer> People_Data=new HashMap<>();
+                for(String s:All_Guild.get(Guild_name).getPeople())People_Data.put(s,Contribution.Get_Contribution_info(s));
+                People_Data.put(player_name,Contribution.Get_Contribution_info(player_name));
+                Guild_Setup.Get_Guild_Yaml(Guild_name).set(Guild_name+".People",People_Data);
+                People_Data=new HashMap<>();
+                for(String s:All_Guild.get(Guild_name).getVIP())People_Data.put(s,Contribution.Get_Contribution_info(s));
+                People_Data.remove(player_name);
+                Guild_Setup.Get_Guild_Yaml(Guild_name).set(Guild_name+".VIP", People_Data);
                 return  find;
             }else return false;
         }else
