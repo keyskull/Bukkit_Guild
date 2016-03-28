@@ -51,10 +51,9 @@ object Guild_Launch {
   case object ERROR extends Massge_type
   lazy val config: mutable.Map[String, Any] = mutable.Map(
     "language"->"zh",
-    "yooo" -> "dsadsa",
     "Create_Guild_Money" -> 50000,
     "Guild-Max-People" -> 50,
-    "yo" -> true,
+    "Guild_Skull_Enable" -> true,
     "auto_save"->60
   )
   def get_Config_asJava():util.Map[String, Any] = config.asJava
