@@ -5,10 +5,7 @@ import com.bekvon.bukkit.residence.ConfigManager;
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.economy.EconomyInterface;
 import com.bekvon.bukkit.residence.permissions.PermissionManager;
-import com.bekvon.bukkit.residence.protection.ClaimedResidence;
-import com.bekvon.bukkit.residence.protection.CuboidArea;
-import com.bekvon.bukkit.residence.protection.ResidenceManager;
-import com.bekvon.bukkit.residence.protection.WorldFlagManager;
+import com.bekvon.bukkit.residence.protection.*;
 import com.bekvon.bukkit.residence.selection.SelectionManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -35,9 +32,10 @@ public class Guild_Claim {
 
     public boolean Create_Claim_Block(Player player,String owner, Location location){
         ClaimedResidence res = Residence.getResidenceManager().getByLoc(location);
-
+        //FlagPermissions.addFlag();
         //cmanager.
         //rmanager.addResidence(player,owner,location,null,true);
+        ResidencePermissions perms = res.getPermissions();
         return true;
     }
 
